@@ -25,20 +25,44 @@ module id_stage(
   output wire [`REG_BUS]op2
 );
 
-
-// I-type
 wire [6  : 0]opcode;
 wire [4  : 0]rd;
 wire [2  : 0]func3;
 wire [4  : 0]rs1;
-wire [11 : 0]imm;
+wire [4  : 0]rs2;
 assign opcode = inst[6  :  0];
 assign rd     = inst[11 :  7];
 assign func3  = inst[14 : 12];
 assign rs1    = inst[19 : 15];
+assign rs2    = inst[24 : 20];
+
+//judge inst type from opcode,to avoid large-scale decoder
+wire type_J;
+wire type_R;
+wire type_S;
+wire type_B;
+wire type_u_lui;
+wire type_u_auipc;
+wire type_i_arich;
+wire type_i_load;
+wire type_i_jalr;
+wire type_i_env;
+assign type_J = opcode[2] & opcode[3] & ~opcode[4] & opcode[5] & opcode[6];
+assign type_R = ~opcode[2] & ~opcode[3] & opcode[4] & opcode[5] & ~opcode[6];
+assign type_S = ~opcode[2] & ~opcode[3] & ~opcode[4] & opcode[5] & ~opcode[6];
+assign type_B = ~opcode[2] & ~opcode[3] & ~opcode[4] & opcode[5] & opcode[6];
+assign type_u_lui = opcode[2] & ~opcode[3] & opcode[4] & opcode[5] & ~opcode[6];
+assign type_u_auipc = opcode[2] & ~opcode[3] & opcode[4] & ~opcode[5] & ~opcode[6];
+assign type_i_arich = ~opcode[2] & ~opcode[3] & opcode[4] & ~opcode[5] & ~opcode[6];    //in fact, arich or logic
+assign type_i_load = ~opcode[2] & ~opcode[3] & ~opcode[4] & ~opcode[5] & ~opcode[6];
+assign type_i_jalr = opcode[2] & ~opcode[3] & ~opcode[4] & opcode[5] & opcode[6];
+assign type_i_env = ~opcode[2] & ~opcode[3] & opcode[4] & opcode[5] & opcode[6];
+
+// I-type
+wire [11 : 0]imm;
 assign imm    = inst[31 : 20];
 
-wire inst_addi =   ~opcode[2] & ~opcode[3] & opcode[4] & ~opcode[5] & ~opcode[6]
+wire inst_addi =   type_i_arich
                  & ~func3[0] & ~func3[1] & ~func3[2];
 
 // arith inst: 10000; logic: 01000;

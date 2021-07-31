@@ -62,9 +62,15 @@ assign type_i_env = ~opcode[2] & ~opcode[3] & opcode[4] & opcode[5] & opcode[6];
 wire [11 : 0]imm;
 assign imm    = inst[31 : 20];
 
-wire inst_addi =   type_i_arich
-                 & ~func3[0] & ~func3[1] & ~func3[2];
-
+wire inst_addi =    type_i_arich & ~func3[0] & ~func3[1] & ~func3[2];
+wire inst_xori =    type_i_arich & func3[0] & ~func3[1] & ~func3[2];
+wire inst_ori =     type_i_arich & func3[0] & func3[1] & ~func3[2];
+wire inst_andi =    type_i_arich & func3[0] & func3[1] & func3[2];
+wire inst_slli =    type_i_arich & func3[0] & ~func3[1] & ~func3[2] & ~imm[10];//
+wire inst_srli =    type_i_arich & ~func3[0] & func3[1] & ~func3[2] & ~imm[10];
+wire inst_srai =    type_i_arich & ~func3[0] & func3[1] & ~func3[2] & imm[10];
+wire inst_slti =    type_i_arich & func3[0] & ~func3[1] & func3[2];
+wire inst_slti =    type_i_arich & func3[0] & ~func3[1] & func3[2];
 // arith inst: 10000; logic: 01000;
 // load-store: 00100; j: 00010;  sys: 000001
 assign inst_type[4] = ( rst == 1'b1 ) ? 0 : inst_addi;

@@ -23,6 +23,4 @@ ALU alu(.rst(rst),
         .result(rd_data)
 );
 
-
-
 endmodule

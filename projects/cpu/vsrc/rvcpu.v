@@ -11,7 +11,7 @@ module rvcpu(
   input wire            rst,
   input wire  [31 : 0]  inst,
   
-  output wire [63 : 0]  inst_addr, 
+  output wire `REG_BUS  inst_addr, 
   output wire           inst_ena
 );
 

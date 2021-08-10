@@ -6,8 +6,12 @@
 module if_stage(
   input wire clk,
   input wire rst,
-  
-  output wire [63 : 0]inst_addr,
+  input wire pc_op1,
+  input wire pc_op2,
+  input wire `REG_BUS rs1_data,
+  input wire `REG_BUS imm_data,
+
+  output wire `REG_BUS inst_addr,
   output wire         inst_ena
   
 );

@@ -1,8 +1,8 @@
 `include "defines.v"
 module comp (
-input wire `REG_BUS op1,op2,
+input wire [`REG_BUS] op1,op2,
 input wire u, //high means unsigned comparation 
-output wire  `REG_BUS result,
+output wire  [`REG_BUS] result,
 output reg  eq_flag,
 output wire less_flag
 );

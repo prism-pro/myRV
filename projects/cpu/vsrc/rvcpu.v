@@ -11,7 +11,7 @@ module rvcpu(
   input wire            rst,
   input wire  [31 : 0]  inst,
   
-  output wire `REG_BUS  inst_addr, 
+  output wire [`REG_BUS]  inst_addr, 
   output wire           inst_ena
 );
 
@@ -45,8 +45,8 @@ wire [`REG_BUS]imm_data;
 // regfile -> id_stage
 
 //reg_file -> exe stage
-wire `REG_BUS rs_data1;
-wire `REG_BUS rs_data2;
+wire [`REG_BUS] rs_data1;
+wire [`REG_BUS] rs_data2;
 
 // exe_stage
 // exe_stage -> if stage
@@ -54,7 +54,7 @@ wire eq_flag;
 wire less_flag;
 wire [4 : 0]inst_type_o;
 // exe_stage -> regfile
-wire `REG_BUS rd_data;
+wire [`REG_BUS] rd_data;
 
 if_stage If_stage(
   .clk(clk),

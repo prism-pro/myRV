@@ -15,7 +15,7 @@ module id_stage(
   output wire rd_w_ena,
   output wire [4 : 0]rd_w_addr,
   
-  output reg `REG_BUS imm_data,
+  output reg [`REG_BUS] imm_data,
 
   output wire link,
   output wire pc_jump,

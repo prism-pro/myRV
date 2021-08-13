@@ -13,11 +13,11 @@ module if_stage(
   input wire pc_b_eq,
   input wire pc_b_less,
   input wire pc_b_n,
-  input wire `REG_BUS rs1_data,
-  input wire `REG_BUS imm_data,
+  input wire [`REG_BUS] rs1_data,
+  input wire [`REG_BUS] imm_data,
   
 
-  output wire `REG_BUS inst_addr,
+  output wire [`REG_BUS] inst_addr,
   output wire         inst_ena
   
 );

@@ -1,8 +1,8 @@
 
 `timescale 1ns / 1ps
-
+`define PC_START   64'h08000000_00000000
 `define ZERO_WORD  64'h00000000_00000000   
-`define REG_BUS    [63 : 0]     
+`define REG_BUS     63 : 0     
 `define LOW_WORD    31:0
 `define HIGH_WORD   63:32
 

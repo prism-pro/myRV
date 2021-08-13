@@ -1,9 +1,11 @@
 `include "defines.v"
-module comp (op1,op2,u,result,eq_flag);
-input wire `REG_BUS op1,op2;
-input wire u; //high means unsigned comparation 
-output wire  `REG_BUS result;
-output reg  eq_flag;
+module comp (
+input wire `REG_BUS op1,op2,
+input wire u, //high means unsigned comparation 
+output wire  `REG_BUS result,
+output reg  eq_flag,
+output wire less_flag
+);
 reg  re;
 always @(*) begin
     if(u)
@@ -42,6 +44,6 @@ always @(*) begin
         eq_flag = 1'b0;
     end
 end
-
+assign less_flag = re;
 assign result = { 63'b0, re};
 endmodule

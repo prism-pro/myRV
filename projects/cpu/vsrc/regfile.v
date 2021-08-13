@@ -15,7 +15,8 @@ module regfile(
 	
 	input  wire  [4  : 0] r_addr2,
 	output reg   [`REG_BUS] r_data2,
-	input  wire 		  r_ena2
+	input  wire 		  r_ena2,
+	input wire w_data_s
     );
 
     // 32 registers

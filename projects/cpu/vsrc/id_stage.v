@@ -17,6 +17,7 @@ module id_stage(
   
   output reg `REG_BUS imm_data,
 
+  output wire link,
   output wire pc_jump,
   output wire pc_b_eq,
   output wire pc_b_less,
@@ -25,8 +26,7 @@ module id_stage(
   output wire rd_s,
   output wire op1,
   output wire op2,
-  output wire `REG_BUS pc_imm,
-
+  
   output wire z-exp,
   output wire mem_acs// to be decided
 );
@@ -214,6 +214,7 @@ assign op2 = ( rst == 1'b1 ) ? 0 :  ( R_type |  branchs );
 assign rd_s = ( rst == 1'b1 ) ? 0 : ! loads ;
 
 //branch control
+assign link = inst_jal;
 assign pc_jump = inst_jal | inst_jalr;
 assign pc_b_eq = inst_beq | isnt_bne;
 assign pc_b_less = inst_blt | inst_bltu;

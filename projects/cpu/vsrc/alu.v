@@ -1,12 +1,13 @@
 `include "defines.v"
 module ALU (
-    rst, aluop, op1, op2,result, eq_flag
-);  
-    input wire rst;
-    input wire  [3:0] aluop;
-    input wire `REG_BUS op1,op2;
-    output wire `REG_BUS result;
-    output wire eq_flag;
+    
+    input wire rst,
+    input wire  [3:0] aluop,
+    input wire `REG_BUS op1,op2,
+    output wire `REG_BUS result,
+    output wire eq_flag,
+    output wire less_flag
+    );
         
     reg  [3:0] block_en;
     wire en_arth, en_logic, en_shift, en_comp;
@@ -69,7 +70,8 @@ module ALU (
                 .op2(op2_comp),
                 .u(aluop[1]),
                 .result(result_comp),
-                .eq_flag(eq_flag)
+                .eq_flag(eq_flag),
+                .less_flag(less_flag)
     );
     //output selection
     always @(*) begin

@@ -15,15 +15,20 @@ module id_stage(
   output wire rd_w_ena,
   output wire [4 : 0]rd_w_addr,
   
-  output wire `REG_BUS imm_data,
+  output reg `REG_BUS imm_data,
 
-  output wire pc_op1,
-  output wire pc_op2,
+  output wire pc_jump,
+  output wire pc_b_eq,
+  output wire pc_b_less,
+  output wire pc_b_n,
   output reg [3 : 0] aluop,
   output wire rd_s,
   output wire op1,
-  output wire op2
+  output wire op2,
+  output wire `REG_BUS pc_imm,
 
+  output wire z-exp,
+  output wire mem_acs// to be decided
 );
 
 //inst fields
@@ -34,6 +39,10 @@ wire [4  : 0]rs1;
 wire [4  : 0]rs2;
 wire [11 : 0]imm_i;
 wire [6 : 0]func_7;
+wire [11 : 0]imm_s;
+wire [11 : 0]imm_b;
+wire [19 : 0]imm_u;
+wire [19 : 0]imm_j;
 assign opcode = inst[6  :  0];
 assign rd     = inst[11 :  7];
 assign func3  = inst[14 : 12];
@@ -41,6 +50,11 @@ assign rs1    = inst[19 : 15];
 assign rs2    = inst[24 : 20];
 assign imm_i  = inst[31 : 20];
 assign func_7 = inst[31 : 25];
+assign imm_s  = {inst[31:25], inst[11 : 7]};
+assign imm_b  = {inst[31], inst[7] , inst[30 : 25] , inst[11 : 8]};
+assign imm_u  = inst[31:12];
+assign imm_j  = {inst[31], inst[20], inst[19 : 12], inst[30 : 21]};
+
 
 //opcode & fun3 1st stage decode
 wire opcode_6_5_00 = (opcode[6 : 5] == 2'b00) ? 1'b1 :1'b0;
@@ -182,16 +196,55 @@ always @(*) begin
   default: aluop[1:0] = 2'b00;
   endcase
 end
+//generate reg enable and addr
+assign rs1_r_ena = (rst == 1'b1) ? 1'b0 :! (inst_jal | inst_jalr);
+assign rs1_r_addr = ( rst == 1'b1 ) ? 0 :  rs1 ;
 
-assign rs1_r_ena  = ( rst == 1'b1 ) ? 0 : inst_type[4];
-assign rs1_r_addr = ( rst == 1'b1 ) ? 0 : ( inst_type[4] == 1'b1 ? rs1 : 0 );
-assign rs2_r_ena  = 0;
-assign rs2_r_addr = 0;
+assign rs2_r_ena  = ( rst == 1'b1 ) ? 0 : (R_type | branchs);
+assign rs2_r_addr = ( rst == 1'b1 ) ? 0 :  rs2 ;
 
-assign rd_w_ena   = ( rst == 1'b1 ) ? 0 : inst_type[4];
-assign rd_w_addr  = ( rst == 1'b1 ) ? 0 : ( inst_type[4] == 1'b1 ? rd  : 0 );
+assign rd_w_ena   = ( rst == 1'b1 ) ? 0 : ( stores | branchs );
+assign rd_w_addr  = ( rst == 1'b1 ) ? 0 : rd;
 
+//generate alu operant select
+assign op1 = ( rst == 1'b1 ) ? 0 : ! ( inst_jalr | inst_jal | inst_auipc | inst_lui );
+assign op2 = ( rst == 1'b1 ) ? 0 :  ( R_type |  branchs );
 
+//rd select
+assign rd_s = ( rst == 1'b1 ) ? 0 : ! loads ;
+
+//branch control
+assign pc_jump = inst_jal | inst_jalr;
+assign pc_b_eq = inst_beq | isnt_bne;
+assign pc_b_less = inst_blt | inst_bltu;
+assign pc_b_n = isnt_bne | inst_bge | inst_bgeu;
+
+// pc adder operant select
+//assign pc_op1 = ( rst == 1'b1 ) ? 0 : !  inst_jalr ;
+//assign pc_op2 = ( rst == 1'b1 ) ? 0 : ! ( branchs | inst_auipc );
+
+//memory access enable
+assign mem_acs = ( rst == 1'b1 ) ? 0 :  (loads | stores) ;
+
+// generate imm data
+wire imm_zero_e = inst_sltiu | inst_bgeu | inst_bltu;
+always @(*) begin
+  if (rst == 1'b1) begin
+    imm_data = 64'b0;
+  end else begin
+    case ({(I_type_arth | loads | inst_jalr) , branchs, stores ,(inst_auipc | inst_lui), inst_jal })
+      5'b10000: imm_data = (imm_zero_e) ? {52'b0,imm_i} : {52{imm_i[11]},imm_i};
+      5'b01000: imm_data = (imm_zero_e) ? {51'b0,imm_b,1'b0} : {51{imm_i[11]},imm_b,1'b0};
+      5'b00100: imm_data = {52{imm_s[11]},imm_s};
+      5'b00010: imm_data = {imm_u ,12'b0};
+      5'b00001: imm_data = {11{imm_j[19]}, imm_j ,1'b0};
+      default: imm_data = 64'b0;
+  endcase
+  end
+  end
+  
+//load or store expand
+assign z_exp = inst_lbu | inst_lhu | inst_lwu ;
 
 
 endmodule

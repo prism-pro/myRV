@@ -43,5 +43,5 @@ always @(*) begin
     end
 end
 
-assign result = {64{re}};
+assign result = { 63'b0, re};
 endmodule

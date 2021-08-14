@@ -45,8 +45,8 @@ wire [`REG_BUS]imm_data;
 // regfile -> id_stage
 
 //reg_file -> exe stage
-wire [`REG_BUS] rs_data1;
-wire [`REG_BUS] rs_data2;
+wire [`REG_BUS] rs1_data;
+wire [`REG_BUS] rs2_data;
 
 // exe_stage
 // exe_stage -> if stage
@@ -82,6 +82,7 @@ id_stage Id_stage(
   .rs2_r_addr(rs2_r_addr),
   .rd_w_ena(rd_w_ena),
   .rd_w_addr(rd_w_addr),
+  .rd_s(rd_s),
 
   .pc_jump(pc_jump),
   .pc_b_eq(pc_b_eq),
@@ -94,13 +95,14 @@ id_stage Id_stage(
   .imm_data(imm_data),
   .aluop(aluop),
   .z_exp(),
-  .mem_acs(),
+  .mem_acs()
 );
 
 exe_stage Exe_stage(
   .rst(rst),
   .op1(op1),
   .op2(op2),
+  .aluop(aluop),
   .rs1_data(rs1_data),
   .rs2_data(rs2_data),
   .imm_data(imm_data),
@@ -118,10 +120,10 @@ regfile Regfile(
   .w_ena(rd_w_ena),
   .w_data_s(rd_s),
   .r_addr1(rs1_r_addr),
-  .rs1_data(rs1_data),
+  .r_data1(rs1_data),
   .r_ena1(rs1_r_ena),
   .r_addr2(rs2_r_addr),
-  .rs2_data(rs2_data),
+  .r_data2(rs2_data),
   .r_ena2(rs2_r_ena)
 );
 

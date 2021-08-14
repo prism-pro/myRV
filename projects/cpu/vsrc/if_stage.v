@@ -46,6 +46,8 @@ always @(*) begin
 end
 
 // fetch an instruction
+wire [`REG_BUS] pc_operant1 = (pc_op1) ? rs1_data :pc ;
+wire [`REG_BUS] pc_operant2 = (pc_op2) ? 64'd4 : imm_data ;
 always@( posedge clk )
 begin
   if( rst == 1'b1 )
@@ -54,7 +56,7 @@ begin
   end
   else
   begin
-    pc <= (pc_op1) ? rs1_data :pc  + (pc_op2) ? 64'd4 : imm_data ;
+    pc <= pc_operant1  + pc_operant2  ;
   end
 end
 

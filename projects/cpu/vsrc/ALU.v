@@ -4,17 +4,21 @@ module ALU (
     input wire rst,
     input wire  [3:0] aluop,
     input wire [`REG_BUS] op1,op2,
-    output wire [`REG_BUS] result,
+    output reg [`REG_BUS] result,
     output wire eq_flag,
     output wire less_flag
     );
         
     reg  [3:0] block_en;
     wire en_arth, en_logic, en_shift, en_comp;
-    wire [`REG_BUS] op1_arth, [`REG_BUS] op2_arth;
-    wire [`REG_BUS] op1_logic,[`REG_BUS] op2_logic;
-    wire [`REG_BUS] op1_shift, [5:0] op2_shift;
-    wire [`REG_BUS] op1_comp, [`REG_BUS] op2_comp;
+    wire [`REG_BUS] op1_arth;
+    wire [`REG_BUS] op2_arth;
+    wire [`REG_BUS] op1_logic;
+    wire [`REG_BUS] op2_logic;
+    wire [`REG_BUS] op1_shift; 
+    wire[5:0] op2_shift;
+    wire [`REG_BUS] op1_comp; 
+    wire [`REG_BUS] op2_comp;
 
     
     //generate block selection 
@@ -29,7 +33,7 @@ module ALU (
             2'b01 : block_en = 4'h2;
             2'b10 : block_en = 4'h4;
             2'b11 : block_en = 4'h8;
-            default: 4'h0;
+            default:block_en = 4'h0;
         endcase
         end
     end
@@ -50,6 +54,7 @@ module ALU (
         2'b10 : result_logic = op1_logic | op2_logic;
         2'b11 : result_logic = op1_logic & op2_logic;
         default :result_logic = 64'b0;
+    endcase
     end
 
     //shifter
@@ -66,7 +71,7 @@ module ALU (
     wire [`REG_BUS] result_comp;
     assign op1_comp = en_comp ? op1 : 64'b0;
     assign op2_comp = en_comp ? op2 : 64'b0;
-    comp comp_1 (.op1(op1_comp),
+    comparator comp_1 (.op1(op1_comp),
                 .op2(op2_comp),
                 .u(aluop[1]),
                 .result(result_comp),
@@ -76,7 +81,7 @@ module ALU (
     //output selection
     always @(*) begin
         if (rst) begin
-            block_en = 4'h0;
+            result = 64'h0;
         end
         else begin
         case (aluop[3:2])
@@ -84,7 +89,7 @@ module ALU (
             2'b01 : result = result_logic;
             2'b10 : result = result_shift;
             2'b11 : result = result_comp;
-            default: 4'h0;
+            default: result = 64'h0;
         endcase
         end
     end

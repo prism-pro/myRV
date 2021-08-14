@@ -7,7 +7,6 @@ module id_stage(
   input wire rst,
   input wire [31 : 0]inst,
   
-  
   output wire rs1_r_ena,
   output wire [4 : 0]rs1_r_addr,
   output wire rs2_r_ena,
@@ -27,7 +26,7 @@ module id_stage(
   output wire op1,
   output wire op2,
   
-  output wire z-exp,
+  output wire z_exp,
   output wire mem_acs// to be decided
 );
 
@@ -132,7 +131,7 @@ wire inst_sd = opcode_6_5_01 & opcode_4_2_000 & func3_011;
 
 //branch
 wire inst_beq = opcode_6_5_11 & opcode_4_2_000 & func3_000;
-wire isnt_bne = opcode_6_5_11 & opcode_4_2_000 & func3_001;
+wire inst_bne = opcode_6_5_11 & opcode_4_2_000 & func3_001;
 wire inst_blt = opcode_6_5_11 & opcode_4_2_000 & func3_100;
 wire inst_bge = opcode_6_5_11 & opcode_4_2_000 & func3_101;
 wire inst_bltu = opcode_6_5_11 & opcode_4_2_000 & func3_110;
@@ -173,7 +172,7 @@ assign alu_logic = inst_xor | inst_or | inst_and | inst_xori | inst_ori | inst_a
 assign alu_shift = inst_sll | inst_srl | inst_sra | inst_slli | inst_srli | inst_srai | inst_sllw | inst_srlw | inst_sraw | inst_slliw | inst_srliw | inst_sraiw;
 assign alu_comp = inst_slt | inst_slti | inst_sltu | inst_sltiu | branchs;
 assign alu_00 = inst_add | inst_addi | inst_addw | inst_addiw | loads | stores | inst_auipc;
-assign alu_01 = inst_sub | isnt_subw | inst_srl | inst_srli |inst_srliw inst_srlw ;
+assign alu_01 = inst_sub | inst_subw | inst_srl | inst_srli |inst_srliw | inst_srlw ;
 assign alu_10 = inst_or | inst_ori | inst_bltu | inst_bgeu | inst_sltiu;
 assign alu_11 = inst_and | inst_andi | inst_sra | inst_srai | inst_sraw |inst_sraiw ;
 
@@ -216,9 +215,9 @@ assign rd_s = ( rst == 1'b1 ) ? 0 : ! loads ;
 //branch control
 assign link = inst_jal;
 assign pc_jump = inst_jal | inst_jalr;
-assign pc_b_eq = inst_beq | isnt_bne;
+assign pc_b_eq = inst_beq | inst_bne;
 assign pc_b_less = inst_blt | inst_bltu;
-assign pc_b_n = isnt_bne | inst_bge | inst_bgeu;
+assign pc_b_n = inst_bne | inst_bge | inst_bgeu;
 
 // pc adder operant select
 //assign pc_op1 = ( rst == 1'b1 ) ? 0 : !  inst_jalr ;
@@ -234,11 +233,11 @@ always @(*) begin
     imm_data = 64'b0;
   end else begin
     case ({(I_type_arth | loads | inst_jalr) , branchs, stores ,(inst_auipc | inst_lui), inst_jal })
-      5'b10000: imm_data = (imm_zero_e) ? {52'b0,imm_i} : {52{imm_i[11]},imm_i};
-      5'b01000: imm_data = (imm_zero_e) ? {51'b0,imm_b,1'b0} : {51{imm_i[11]},imm_b,1'b0};
-      5'b00100: imm_data = {52{imm_s[11]},imm_s};
-      5'b00010: imm_data = {imm_u ,12'b0};
-      5'b00001: imm_data = {11{imm_j[19]}, imm_j ,1'b0};
+      5'b10000: imm_data = (imm_zero_e) ? {52'b0,imm_i} : {{52{imm_i[11]}},imm_i};
+      5'b01000: imm_data = (imm_zero_e) ? {51'b0,imm_b,1'b0} : {{51{imm_i[11]}},imm_b,1'b0};
+      5'b00100: imm_data = {{52{imm_s[11]}},imm_s};
+      5'b00010: imm_data = {{32{imm_u[19]}},imm_u ,12'b0};
+      5'b00001: imm_data = {{43{imm_j[19]}}, imm_j ,1'b0};
       default: imm_data = 64'b0;
   endcase
   end

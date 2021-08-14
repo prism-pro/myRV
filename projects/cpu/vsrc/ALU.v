@@ -29,10 +29,10 @@ module ALU (
         end
         else begin
         case (aluop[3:2])
-            2'b00 : block_en = 4'h1;
-            2'b01 : block_en = 4'h2;
-            2'b10 : block_en = 4'h4;
-            2'b11 : block_en = 4'h8;
+            2'b00 : block_en = 4'h8;
+            2'b01 : block_en = 4'h4;
+            2'b10 : block_en = 4'h2;
+            2'b11 : block_en = 4'h1;
             default:block_en = 4'h0;
         endcase
         end

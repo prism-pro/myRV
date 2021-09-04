@@ -156,6 +156,7 @@ wire stores = opcode_6_5_01 & opcode_4_2_000;
 wire branchs = opcode_6_5_11 & opcode_4_2_000;
 wire R_type =opcode_6_5_01 & (opcode_4_2_100 | opcode_4_2_110 ) ;
 wire I_type_arth = opcode_6_5_00 | (opcode_4_2_110 | opcode_4_2_100) ; 
+wire J_type = inst_jal | inst_jalr;
 
 //generate alu operation code
 wire alu_arth;
@@ -202,7 +203,7 @@ assign rs1_r_addr = ( rst == 1'b1 ) ? 0 :  rs1 ;
 assign rs2_r_ena  = ( rst == 1'b1 ) ? 0 : (R_type | branchs);
 assign rs2_r_addr = ( rst == 1'b1 ) ? 0 :  rs2 ;
 
-assign rd_w_ena   = ( rst == 1'b1 ) ? 0 : ( stores | branchs );
+assign rd_w_ena   = ( rst == 1'b1 ) ? 0 : ( stores | branchs | R_type | I_type_arth | J_type | inst_auipc | inst_lui);
 assign rd_w_addr  = ( rst == 1'b1 ) ? 0 : rd;
 
 //generate alu operant select
